@@ -23,33 +23,47 @@ interface SearchParams {
 }
 
 async function getProducts(searchParams: SearchParams) {
-  const page = parseInt(searchParams.page || '1');
-  const limit = 20;
+  try {
+    const page = parseInt(searchParams.page || '1');
+    const limit = 20;
 
-  // Build query parameters
-  const params = new URLSearchParams();
-  params.set('page', page.toString());
-  params.set('limit', limit.toString());
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.set('page', page.toString());
+    params.set('limit', limit.toString());
 
-  if (searchParams.category) params.set('category', searchParams.category);
-  if (searchParams.minPrice) params.set('minPrice', searchParams.minPrice);
-  if (searchParams.maxPrice) params.set('maxPrice', searchParams.maxPrice);
-  if (searchParams.brand) params.set('brand', searchParams.brand);
-  if (searchParams.inStock) params.set('inStock', searchParams.inStock);
-  if (searchParams.featured) params.set('featured', searchParams.featured);
-  if (searchParams.sortBy) params.set('sortBy', searchParams.sortBy);
-  if (searchParams.search) params.set('search', searchParams.search);
+    if (searchParams.category) params.set('category', searchParams.category);
+    if (searchParams.minPrice) params.set('minPrice', searchParams.minPrice);
+    if (searchParams.maxPrice) params.set('maxPrice', searchParams.maxPrice);
+    if (searchParams.brand) params.set('brand', searchParams.brand);
+    if (searchParams.inStock) params.set('inStock', searchParams.inStock);
+    if (searchParams.featured) params.set('featured', searchParams.featured);
+    if (searchParams.sortBy) params.set('sortBy', searchParams.sortBy);
+    if (searchParams.search) params.set('search', searchParams.search);
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/products?${params.toString()}`,
-    { cache: 'no-store' }
-  );
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/products?${params.toString()}`,
+      { cache: 'no-store' }
+    );
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch products');
+    if (!response.ok) {
+      console.error('Products API error:', response.status, response.statusText);
+      const errorData = await response.text();
+      console.error('Error details:', errorData);
+      return {
+        success: false,
+        data: { products: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } }
+      };
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Failed to fetch products:', error);
+    return {
+      success: false,
+      data: { products: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } }
+    };
   }
-
-  return response.json();
 }
 
 async function getCategories() {

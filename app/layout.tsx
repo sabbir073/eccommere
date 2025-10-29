@@ -5,6 +5,7 @@ import { ToastProvider } from "@/contexts/ToastContext";
 import ToastContainer from "@/components/ui/Toast";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: {
     default: "Alabili - Your Trusted Online Shopping Destination in Bangladesh",
     template: "%s | Alabili",
