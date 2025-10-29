@@ -19,7 +19,7 @@ function buildCategoryTree(categories: Category[]): Category[] {
     const category = categoryMap.get(cat.id)!;
     if (cat.parent_id === null) {
       rootCategories.push(category);
-    } else {
+    } else if (cat.parent_id !== undefined) {
       const parent = categoryMap.get(cat.parent_id);
       if (parent) {
         parent.children = parent.children || [];

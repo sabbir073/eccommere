@@ -14,7 +14,8 @@
       "Bash(curl:*)",
       "Read(//c/Users/Sabbir Ahmed/OneDrive/Desktop/hotel/**)",
       "Bash(node -e:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

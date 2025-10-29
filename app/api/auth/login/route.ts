@@ -44,14 +44,21 @@ export async function POST(request: NextRequest) {
 
     if (guestSessionId) {
       // Get guest cart items
-      const guestCartItems = await query(
+      interface CartItem {
+        id: number;
+        product_id: number;
+        variant_id: number | null;
+        quantity: number;
+      }
+
+      const guestCartItems = await query<CartItem>(
         'SELECT * FROM cart WHERE guest_session_id = ?',
         [guestSessionId]
       );
 
       // Merge each guest item with user cart
       for (const guestItem of guestCartItems) {
-        const existing = await query(
+        const existing = await query<CartItem>(
           'SELECT * FROM cart WHERE user_id = ? AND product_id = ? AND (variant_id = ? OR (variant_id IS NULL AND ? IS NULL))',
           [user.id, guestItem.product_id, guestItem.variant_id || null, guestItem.variant_id || null]
         );

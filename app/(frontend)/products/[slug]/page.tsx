@@ -8,10 +8,76 @@ import ProductCard from '@/components/product/ProductCard';
 import ProductTabs from '@/components/product/ProductTabs';
 import { query, queryOne } from '@/lib/db';
 
-async function getProduct(slug: string) {
+interface ProductData {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  long_description: string;
+  price: number;
+  compare_price: number;
+  sku: string;
+  brand: string;
+  stock_quantity: number;
+  low_stock_threshold: number;
+  weight: string;
+  dimensions: string;
+  category_id: number;
+  category_name: string;
+  category_slug: string;
+  average_rating: string;
+  total_reviews: number;
+  is_active: boolean;
+  meta_title: string;
+  meta_description: string;
+  meta_keywords: string;
+}
+
+interface ProductImage {
+  id: number;
+  product_id: number;
+  image_url: string;
+  alt_text: string;
+  is_primary: boolean;
+  sort_order: number;
+}
+
+interface ProductVariant {
+  id: number;
+  product_id: number;
+  name: string;
+  value: string;
+  price_modifier: number;
+  price_adjustment: number;
+  stock_quantity: number;
+  sku?: string;
+  is_active: boolean;
+}
+
+interface ProductReview {
+  id: number;
+  product_id: number;
+  user_id: number;
+  rating: number;
+  title: string;
+  comment: string;
+  first_name: string;
+  last_name: string;
+  is_verified_purchase: boolean;
+  is_approved: boolean;
+  created_at: string;
+}
+
+interface ProductWithDetails extends ProductData {
+  images: ProductImage[];
+  variants: ProductVariant[];
+  reviews: ProductReview[];
+}
+
+async function getProduct(slug: string): Promise<ProductWithDetails | null> {
   try {
     // Get product
-    const product = await queryOne(
+    const product = await queryOne<ProductData>(
       `SELECT p.*, c.name as category_name, c.slug as category_slug
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
@@ -24,19 +90,19 @@ async function getProduct(slug: string) {
     }
 
     // Get images
-    const images = await query(
+    const images = await query<ProductImage>(
       'SELECT * FROM product_images WHERE product_id = ? ORDER BY sort_order, is_primary DESC',
       [product.id]
     );
 
     // Get variants
-    const variants = await query(
+    const variants = await query<ProductVariant>(
       'SELECT * FROM product_variants WHERE product_id = ? AND is_active = TRUE ORDER BY name',
       [product.id]
     );
 
     // Get reviews (approved only)
-    const reviews = await query(
+    const reviews = await query<ProductReview>(
       `SELECT r.*, u.first_name, u.last_name
        FROM product_reviews r
        LEFT JOIN users u ON r.user_id = u.id

@@ -99,7 +99,19 @@ export async function POST(request: NextRequest) {
     const orderNumber = generateOrderNumber();
 
     // Prepare billing address
-    let billingData = {};
+    interface BillingData {
+      billing_name?: string;
+      billing_phone?: string;
+      billing_email?: string;
+      billing_address_line1?: string;
+      billing_address_line2?: string;
+      billing_city?: string;
+      billing_state?: string;
+      billing_postal_code?: string;
+      billing_country?: string;
+    }
+
+    let billingData: BillingData = {};
     if (validatedData.billing_same_as_shipping) {
       billingData = {
         billing_name: validatedData.shipping_name,

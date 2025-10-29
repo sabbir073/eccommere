@@ -20,11 +20,27 @@ async function getGuestSessionId(request: NextRequest): Promise<string> {
 export async function GET(request: NextRequest) {
   try {
     const currentUser = await getCurrentUser();
-    let cartItems;
+
+    interface CartItemData {
+      id: number;
+      product_id: number;
+      variant_id: number | null;
+      quantity: number;
+      product_name: string;
+      product_slug: string;
+      price: string;
+      stock_quantity: number;
+      product_sku: string;
+      variant_name: string | null;
+      price_modifier: string | null;
+      product_image: string | null;
+    }
+
+    let cartItems: CartItemData[];
 
     if (currentUser) {
       // Logged in user - get from database
-      cartItems = await query(
+      cartItems = await query<CartItemData>(
         `SELECT
           c.*,
           p.name as product_name,
@@ -44,7 +60,7 @@ export async function GET(request: NextRequest) {
     } else {
       // Guest user - get from session
       const guestId = await getGuestSessionId(request);
-      cartItems = await query(
+      cartItems = await query<CartItemData>(
         `SELECT
           c.*,
           p.name as product_name,
@@ -65,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     // Calculate totals
     const subtotal = cartItems.reduce((sum, item) => {
-      const price = parseFloat(item.price) + (parseFloat(item.price_modifier) || 0);
+      const price = parseFloat(item.price) + (parseFloat(item.price_modifier || '0') || 0);
       return sum + (price * item.quantity);
     }, 0);
 
@@ -104,9 +120,13 @@ export async function POST(request: NextRequest) {
       message: 'Item added to cart',
     });
 
+    interface CartRecord {
+      id: number;
+    }
+
     if (currentUser) {
       // Logged in user
-      const existing = await query(
+      const existing = await query<CartRecord>(
         'SELECT * FROM cart WHERE user_id = ? AND product_id = ? AND (variant_id = ? OR (variant_id IS NULL AND ? IS NULL))',
         [currentUser.userId, product_id, variant_id || null, variant_id || null]
       );
@@ -134,7 +154,7 @@ export async function POST(request: NextRequest) {
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
 
-      const existing = await query(
+      const existing = await query<CartRecord>(
         'SELECT * FROM cart WHERE guest_session_id = ? AND product_id = ? AND (variant_id = ? OR (variant_id IS NULL AND ? IS NULL))',
         [guestId, product_id, variant_id || null, variant_id || null]
       );

@@ -25,8 +25,17 @@ export async function PUT(
       [is_approved, id]
     );
 
+    interface ReviewData {
+      product_id: number;
+    }
+
+    interface StatsData {
+      avg_rating: number | null;
+      total: number;
+    }
+
     // Update product average rating
-    const review = await query(
+    const review = await query<ReviewData>(
       'SELECT product_id FROM product_reviews WHERE id = ?',
       [id]
     );
@@ -35,7 +44,7 @@ export async function PUT(
       const productId = review[0].product_id;
 
       // Recalculate average rating
-      const stats = await query(
+      const stats = await query<StatsData>(
         `SELECT AVG(rating) as avg_rating, COUNT(*) as total
          FROM product_reviews
          WHERE product_id = ? AND is_approved = TRUE`,
@@ -78,8 +87,17 @@ export async function DELETE(
 
     const { id } = await params;
 
+    interface ReviewData {
+      product_id: number;
+    }
+
+    interface StatsData {
+      avg_rating: number | null;
+      total: number;
+    }
+
     // Get product_id before deleting
-    const review = await query(
+    const review = await query<ReviewData>(
       'SELECT product_id FROM product_reviews WHERE id = ?',
       [id]
     );
@@ -97,7 +115,7 @@ export async function DELETE(
     await query('DELETE FROM product_reviews WHERE id = ?', [id]);
 
     // Recalculate average rating
-    const stats = await query(
+    const stats = await query<StatsData>(
       `SELECT AVG(rating) as avg_rating, COUNT(*) as total
        FROM product_reviews
        WHERE product_id = ? AND is_approved = TRUE`,

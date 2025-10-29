@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
+interface OrderData {
+  id: number;
+  order_number: string;
+  status: string;
+  subtotal: number;
+  shipping_cost: number;
+  tax: number;
+  discount: number;
+  total: number;
+  payment_method: string;
+  payment_status: string;
+  shipping_name: string;
+  shipping_phone: string;
+  shipping_email: string;
+  shipping_address_line1: string;
+  shipping_address_line2: string;
+  shipping_city: string;
+  shipping_state: string;
+  shipping_postal_code: string;
+  shipping_country: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // GET /api/orders/track/[orderNumber] - Track order by order number (PUBLIC)
 export async function GET(
   request: NextRequest,
@@ -17,7 +41,7 @@ export async function GET(
     }
 
     // Fetch order by order number
-    const orders = await query(
+    const orders = await query<OrderData>(
       `SELECT
         id,
         order_number,
