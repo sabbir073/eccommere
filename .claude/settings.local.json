@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(move \"C:\\Users\\Sabbir Ahmed\\OneDrive\\Desktop\\shohel\\ecommerce-platform\\app\\api\\products\\[id]\\route.ts\" \"C:\\Users\\Sabbir Ahmed\\OneDrive\\Desktop\\shohel\\ecommerce-platform\\app\\api\\admin\\products\\[id]\\route.ts\")",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(timeout 5 npm run dev:*)",
+      "Bash(taskkill /F /PID 1164)",
+      "Bash(taskkill //F //PID 1164)",
+      "Bash(timeout 8 npm run dev)",
+      "Bash(curl:*)",
+      "Read(//c/Users/Sabbir Ahmed/OneDrive/Desktop/hotel/**)",
+      "Bash(node -e:*)",
+      "Bash(dir:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
